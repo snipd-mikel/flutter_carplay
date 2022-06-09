@@ -1,9 +1,7 @@
 import UIKit
 import Flutter
-import Foundation
 
 let flutterEngine = FlutterEngine(name: "SharedEngine", project: nil, allowHeadlessExecution: true)
-
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {

@@ -9,39 +9,38 @@ import CarPlay
 
 @available(iOS 14.0, *)
 class FCPTextButton {
-    private(set) var _super: CPTextButton?
-    private(set) var elementId: String
-    private var title: String
-    private var style: CPTextButtonStyle
+  private(set) lazy var cpInstance: CPTextButton = {
+    return CPTextButton.init(title: title, textStyle:style, handler: { _ in
+      DispatchQueue.main.async {
+        SwiftFlutterCarplayPlugin.shared.onTextButtonPressed(self.elementId)
+      }
+    })
+  }()
+  private(set) var elementId: String
+  private var title: String
+  private var style: CPTextButtonStyle
+  
+  init(message: FCPTextButtonMessage) {
+    elementId = message.elementId
+    title = message.title
     
-    init(obj: [String : Any]) {
-        self.elementId = obj["_elementId"] as! String
-        self.title = obj["title"] as! String
-        let style = obj["style"] as? String
-        if style == nil || style == "normal" {
-            self.style = CPTextButtonStyle.normal
-        } else {
-            if style == "cancel"{
-                self.style = CPTextButtonStyle.cancel
-            }
-            else {
-                if style == "confirm"{
-                    self.style = CPTextButtonStyle.confirm
-                }
-                else {
-                    self.style = CPTextButtonStyle.normal
-                }
-            }
-        }
+    switch(message.style) {
+    case .normal:
+      style = .normal
+    case .cancel:
+      style = .cancel
+    case .confirm:
+      style = .confirm
+    @unknown default:
+      style = .normal
     }
-    
-    var get: CPTextButton {
-        let textButton = CPTextButton.init(title: title, textStyle:self.style, handler: { _ in
-            DispatchQueue.main.async {
-                FCPStreamHandlerPlugin.sendEvent(type: FCPChannelTypes.onTextButtonPressed, data: ["elementId": self.elementId])
-            }
-        })
-        self._super = textButton
-        return textButton
-    }
+  }
+}
+
+
+@available(iOS 14.0, *)
+extension FCPTextButton: FCPObject {
+  var children: [FCPObject] {
+    return []
+  }
 }

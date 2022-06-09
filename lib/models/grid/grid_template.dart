@@ -1,11 +1,9 @@
+import 'package:flutter_carplay/messages.dart';
 import 'package:flutter_carplay/models/grid/grid_button.dart';
-import 'package:uuid/uuid.dart';
+import 'package:flutter_carplay/models/template_base.dart';
 
 /// A template object that displays and manages a grid of items.
-class CPGridTemplate {
-  /// Unique id of the object.
-  final String _elementId = const Uuid().v4();
-
+class CPGridTemplate extends CPTemplate {
   /// A title will be shown in the navigation bar.
   final String title;
 
@@ -20,13 +18,18 @@ class CPGridTemplate {
     required this.buttons,
   });
 
-  Map<String, dynamic> toJson() => {
-        "_elementId": _elementId,
-        "title": title,
-        "buttons": buttons.map((e) => e.toJson()).toList(),
-      };
+  CPGridTemplateMessage toMessage() => CPGridTemplateMessage(
+      elementId: elementId,
+      title: title,
+      buttons: buttons.map((e) => e.toMessage()).toList());
 
-  String get uniqueId {
-    return _elementId;
+  @override
+  CPTemplateMessage toTemplateMessage() => CPTemplateMessage(
+        grid: toMessage(),
+      );
+
+  @override
+  List<CPObject> getChildren() {
+    return buttons;
   }
 }

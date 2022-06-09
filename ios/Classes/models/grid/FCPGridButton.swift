@@ -9,28 +9,31 @@ import CarPlay
 
 @available(iOS 14.0, *)
 class FCPGridButton {
-  private(set) var _super: CPGridButton?
-  private(set) var elementId: String
-  private var titleVariants: [String]
-  private var image: String
-  
-  init(obj: [String : Any]) {
-    self.elementId = obj["_elementId"] as! String
-    self.titleVariants = obj["titleVariants"] as! [String]
-    self.image = obj["image"] as! String
-  }
-  
-  var get: CPGridButton {
-    let gridButton = CPGridButton.init(titleVariants: self.titleVariants,
-                                       image: UIImage().fromFlutterAsset(name: self.image),
+  private(set) lazy var cpInstance: CPGridButton = {
+    let gridButton = CPGridButton.init(titleVariants: titleVariants,
+                                       image: image.toUIImage(),
                                        handler: { _ in
       DispatchQueue.main.async {
-        FCPStreamHandlerPlugin.sendEvent(type: FCPChannelTypes.onGridButtonPressed,
-                                         data: ["elementId": self.elementId])
+        SwiftFlutterCarplayPlugin.shared.onGridButtonPressed(self.elementId)
       }
     })
     gridButton.isEnabled = true
-    self._super = gridButton
     return gridButton
+  }()
+  private(set) var elementId: String
+  private var titleVariants: [String]
+  private var image: FCPImage
+  
+  init(message: FCPGridButtonMessage) {
+    elementId = message.elementId
+    titleVariants = message.titleVariants
+    image = message.image.toFCPImage()
+  }
+}
+
+@available(iOS 14.0, *)
+extension FCPGridButton: FCPObject {
+  var children: [FCPObject] {
+    return []
   }
 }

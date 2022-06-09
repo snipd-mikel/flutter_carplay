@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -17,8 +18,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  CPConnectionStatusTypes connectionStatus = CPConnectionStatusTypes.unknown;
-  final FlutterCarplay _flutterCarplay = FlutterCarplay();
+  CPConnectionStatus connectionStatus = CPConnectionStatus.unknown;
+  StreamSubscription? _subscription;
+  final CarplayController _flutterCarplay = CarplayController.instance;
 
   @override
   void initState() {
@@ -31,25 +33,27 @@ class _MyAppState extends State<MyApp> {
           text: "Item 1",
           detailText: "Detail Text",
           onPress: (complete, self) {
-            self.setDetailText("You can change the detail text.. 🚀");
-            self.setAccessoryType(CPListItemAccessoryTypes.cloud);
+            self.update(
+              detailText: "You can change the detail text.. 🚀".nullable,
+              accessoryType: CPListItemAccessoryType.cloud.nullable,
+            );
             Future.delayed(const Duration(seconds: 1), () {
-              self.setDetailText("Customizable Detail Text");
+              self.update(detailText: "Customizable Detail Text".nullable);
               complete();
             });
           },
-          image: 'images/logo_flutter_1080px_clr.png',
+          image: CPImage.flutterAsset('images/logo_flutter_1080px_clr.png'),
         ),
         CPListItem(
           text: "Item 2",
           detailText: "Start progress bar",
           isPlaying: false,
           playbackProgress: 0,
-          image: 'images/logo_flutter_1080px_clr.png',
+          image: CPImage.flutterAsset('images/logo_flutter_1080px_clr.png'),
           onPress: (complete, self) {
             for (var i = 1; i <= 100; i++) {
               sleep(const Duration(milliseconds: 10));
-              self.setPlaybackProgress(i / 100);
+              self.update(playbackProgress: (i / 100).nullable);
               if (i == 100) {
                 complete();
               }
@@ -65,16 +69,16 @@ class _MyAppState extends State<MyApp> {
           text: "Item 3",
           detailText: "Detail Text",
           onPress: (complete, self) {
-            self.updateTexts(
+            self.update(
               text: "You can also change the title",
-              detailText: "and detail text while loading",
+              detailText: "and detail text while loading".nullable,
+              accessoryType: CPListItemAccessoryType.none.nullable,
             );
-            self.setAccessoryType(CPListItemAccessoryTypes.none);
             Future.delayed(const Duration(seconds: 1), () {
               complete();
             });
           },
-          accessoryType: CPListItemAccessoryTypes.disclosureIndicator,
+          accessoryType: CPListItemAccessoryType.disclosureIndicator,
         ),
         CPListItem(text: "Item 4", detailText: "Detail Text"),
         CPListItem(text: "Item 5", detailText: "Detail Text"),
@@ -137,8 +141,8 @@ class _MyAppState extends State<MyApp> {
       header: "Features",
     ));
 
-    FlutterCarplay.setRootTemplate(
-      rootTemplate: CPTabBarTemplate(
+    _flutterCarplay.setRootTemplate(
+      CPTabBarTemplate(
         templates: [
           CPListTemplate(
             sections: section1Items,
@@ -167,18 +171,17 @@ class _MyAppState extends State<MyApp> {
       animated: true,
     );
 
-    _flutterCarplay.forceUpdateRootTemplate();
-
-    _flutterCarplay.addListenerOnConnectionChange(onCarplayConnectionChange);
+    _subscription = _flutterCarplay.connectionStatusChanges
+        .listen(onCarplayConnectionChange);
   }
 
   @override
   void dispose() {
-    _flutterCarplay.removeListenerOnConnectionChange();
+    _subscription?.cancel();
     super.dispose();
   }
 
-  void onCarplayConnectionChange(CPConnectionStatusTypes status) {
+  void onCarplayConnectionChange(CPConnectionStatus status) {
     // Do things when carplay state is connected, background or disconnected
     setState(() {
       connectionStatus = status;
@@ -186,31 +189,31 @@ class _MyAppState extends State<MyApp> {
   }
 
   void showAlert() {
-    FlutterCarplay.showAlert(
-      template: CPAlertTemplate(
+    _flutterCarplay.presentTemplate(
+      CPAlertTemplate(
         titleVariants: ["Alert Title"],
         actions: [
           CPAlertAction(
             title: "Okay",
-            style: CPAlertActionStyles.normal,
+            style: CPAlertActionStyle.normal,
             onPress: () {
-              FlutterCarplay.popModal(animated: true);
+              _flutterCarplay.dismissTemplate(animated: true);
               print("Okay pressed");
             },
           ),
           CPAlertAction(
             title: "Cancel",
-            style: CPAlertActionStyles.cancel,
+            style: CPAlertActionStyle.cancel,
             onPress: () {
-              FlutterCarplay.popModal(animated: true);
+              _flutterCarplay.dismissTemplate(animated: true);
               print("Cancel pressed");
             },
           ),
           CPAlertAction(
             title: "Remove",
-            style: CPAlertActionStyles.destructive,
+            style: CPAlertActionStyle.destructive,
             onPress: () {
-              FlutterCarplay.popModal(animated: true);
+              _flutterCarplay.dismissTemplate(animated: true);
               print("Remove pressed");
             },
           ),
@@ -220,33 +223,33 @@ class _MyAppState extends State<MyApp> {
   }
 
   void showActionSheet() {
-    FlutterCarplay.showActionSheet(
-      template: CPActionSheetTemplate(
+    _flutterCarplay.presentTemplate(
+      CPActionSheetTemplate(
         title: "Action Sheet Template",
         message: "This is an example message.",
         actions: [
           CPAlertAction(
             title: "Cancel",
-            style: CPAlertActionStyles.cancel,
+            style: CPAlertActionStyle.cancel,
             onPress: () {
               print("Cancel pressed in action sheet");
-              FlutterCarplay.popModal(animated: true);
+              _flutterCarplay.dismissTemplate(animated: true);
             },
           ),
           CPAlertAction(
             title: "Dismiss",
-            style: CPAlertActionStyles.destructive,
+            style: CPAlertActionStyle.destructive,
             onPress: () {
               print("Dismiss pressed in action sheet");
-              FlutterCarplay.popModal(animated: true);
+              _flutterCarplay.dismissTemplate(animated: true);
             },
           ),
           CPAlertAction(
             title: "Ok",
-            style: CPAlertActionStyles.normal,
+            style: CPAlertActionStyle.normal,
             onPress: () {
               print("Ok pressed in action sheet");
-              FlutterCarplay.popModal(animated: true);
+              _flutterCarplay.dismissTemplate(animated: true);
             },
           ),
         ],
@@ -255,32 +258,32 @@ class _MyAppState extends State<MyApp> {
   }
 
   void addNewTemplate(CPListTemplate newTemplate) {
-    final currentRootTemplate = FlutterCarplay.rootTemplate!;
+    final currentRootTemplate =
+        _flutterCarplay.rootTemplate! as CPTabBarTemplate;
 
     currentRootTemplate.templates.add(newTemplate);
 
-    FlutterCarplay.setRootTemplate(
-      rootTemplate: currentRootTemplate,
+    _flutterCarplay.setRootTemplate(
+      currentRootTemplate,
       animated: true,
     );
-    _flutterCarplay.forceUpdateRootTemplate();
   }
 
   void removeLastTemplate() {
-    final currentRootTemplate = FlutterCarplay.rootTemplate!;
+    final currentRootTemplate =
+        _flutterCarplay.rootTemplate! as CPTabBarTemplate;
 
     currentRootTemplate.templates.remove(currentRootTemplate.templates.last);
 
-    FlutterCarplay.setRootTemplate(
-      rootTemplate: currentRootTemplate,
+    _flutterCarplay.setRootTemplate(
+      currentRootTemplate,
       animated: true,
     );
-    _flutterCarplay.forceUpdateRootTemplate();
   }
 
   void openGridTemplate() {
-    FlutterCarplay.push(
-      template: CPGridTemplate(
+    _flutterCarplay.push(
+      CPGridTemplate(
         title: "Grid Template",
         buttons: [
           for (var i = 1; i < 9; i++)
@@ -294,7 +297,7 @@ class _MyAppState extends State<MyApp> {
               // FLUTTER AND THE RELATED LOGO ARE TRADEMARKS OF Google LLC.
               // WE ARE NOT ENDORSED BY OR AFFILIATED WITH Google LLC.
               // ----- TRADEMARKS RIGHTS INFORMATION END -----
-              image: 'images/logo_flutter_1080px_clr.png',
+              image: CPImage.flutterAsset('images/logo_flutter_1080px_clr.png'),
               onPress: () {
                 print("Grid Button $i pressed");
               },
@@ -306,8 +309,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   void openListTemplate() {
-    FlutterCarplay.push(
-      template: CPListTemplate(
+    _flutterCarplay.push(
+      CPListTemplate(
         sections: [
           CPListSection(
             header: "A Section",
@@ -337,9 +340,9 @@ class _MyAppState extends State<MyApp> {
         title: "List Template",
         backButton: CPBarButton(
           title: "Back",
-          style: CPBarButtonStyles.none,
+          style: CPBarButtonStyle.none,
           onPress: () {
-            FlutterCarplay.pop(animated: true);
+            _flutterCarplay.pop(animated: true);
           },
         ),
       ),
@@ -348,11 +351,10 @@ class _MyAppState extends State<MyApp> {
   }
 
   void openInformationTemplate() {
-    FlutterCarplay.push(
-        template: CPInformationTemplate(
-            title: "Title",
-            layout: CPInformationTemplateLayout.twoColumn,
-            actions: [
+    _flutterCarplay.push(CPInformationTemplate(
+        title: "Title",
+        layout: CPInformationTemplateLayout.twoColumn,
+        actions: [
           CPTextButton(
               title: "Button Title 1",
               onPress: () {
@@ -364,15 +366,15 @@ class _MyAppState extends State<MyApp> {
                 print("Button 2");
               }),
         ],
-            informationItems: [
-              CPInformationItem(title: "Item title 1", detail: "detail 1"),
-              CPInformationItem(title: "Item title 2", detail: "detail 2"),
+        informationItems: [
+          CPInformationItem(title: "Item title 1", detail: "detail 1"),
+          CPInformationItem(title: "Item title 2", detail: "detail 2"),
         ]));
   }
 
   void openPoiTemplate() {
-    FlutterCarplay.push(
-        template: CPPointOfInterestTemplate(title: "Title", poi: [
+    _flutterCarplay.push(
+        CPPointOfInterestTemplate(title: "Title", poi: [
           CPPointOfInterest(
             latitude: 51.5052,
             longitude: 7.4938,
@@ -382,7 +384,7 @@ class _MyAppState extends State<MyApp> {
             detailTitle: "DetailTitle",
             detailSubtitle: "detailSubtitle",
             detailSummary: "detailSummary",
-            image: "images/logo_flutter_1080px_clr.png",
+            image: CPImage.flutterAsset("images/logo_flutter_1080px_clr.png"),
             primaryButton: CPTextButton(
                 title: "Primary",
                 onPress: () {
@@ -455,8 +457,7 @@ class _MyAppState extends State<MyApp> {
             ),
             Center(
               child: Text(
-                'Carplay Status: ' +
-                    CPEnumUtils.stringFromEnum(connectionStatus),
+                'Carplay Status: ' + connectionStatus.name,
               ),
             ),
             Row(
@@ -494,7 +495,8 @@ class _MyAppState extends State<MyApp> {
                       horizontal: 24,
                     ),
                   ),
-                  onPressed: () => FlutterCarplay.popModal(animated: true),
+                  onPressed: () =>
+                      _flutterCarplay.dismissTemplate(animated: true),
                   child: const Text('Close Modal'),
                 ),
               ],
@@ -510,7 +512,7 @@ class _MyAppState extends State<MyApp> {
                       horizontal: 24,
                     ),
                   ),
-                  onPressed: () => FlutterCarplay.pop(animated: true),
+                  onPressed: () => _flutterCarplay.pop(animated: true),
                   child: const Text('Pop Screen'),
                 ),
                 const SizedBox(width: 20, height: 0),
@@ -522,7 +524,7 @@ class _MyAppState extends State<MyApp> {
                       horizontal: 24,
                     ),
                   ),
-                  onPressed: () => FlutterCarplay.popToRoot(animated: true),
+                  onPressed: () => _flutterCarplay.popToRoot(animated: true),
                   child: const Text('Pop To Root'),
                 ),
               ],
@@ -554,18 +556,6 @@ class _MyAppState extends State<MyApp> {
                   child: const Text('Open Grid\nTemplate'),
                 ),
               ],
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                textStyle: const TextStyle(fontSize: 15),
-                primary: Colors.red,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 12,
-                  horizontal: 24,
-                ),
-              ),
-              onPressed: () => _flutterCarplay.forceUpdateRootTemplate(),
-              child: const Text('Force Update Carplay'),
             ),
             const SizedBox(width: 50, height: 0),
           ],

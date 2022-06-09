@@ -1,18 +1,17 @@
+import 'package:flutter_carplay/carplay_controller.dart';
+import 'package:flutter_carplay/messages.dart';
 import 'package:flutter_carplay/models/button/bar_button.dart';
 import 'package:flutter_carplay/models/list/list_section.dart';
-import 'package:uuid/uuid.dart';
+import 'package:flutter_carplay/models/template_base.dart';
 
 /// A template object that displays and manages a list of items.
-class CPListTemplate {
-  /// Unique id of the object.
-  final String _elementId = const Uuid().v4();
-
+class CPListTemplate extends CPTemplate with CPMutableObject {
   /// A title displayed in the navigation bar.
   /// It will be displayed when only the list template is visible.
   final String? title;
 
   /// An array of list sections as [CPListSection], each can contain zero or more list items.
-  final List<CPListSection> sections;
+  List<CPListSection> sections;
 
   /// An optional array of title variants for the template’s empty view.
   /// Provide the strings as localized displayable content and order from most- to
@@ -68,22 +67,32 @@ class CPListTemplate {
     this.emptyViewTitleVariants,
     this.emptyViewSubtitleVariants,
     this.showsTabBadge = false,
-    required this.systemIcon,
+    this.systemIcon = '',
     this.backButton,
   });
 
-  Map<String, dynamic> toJson() => {
-        "_elementId": _elementId,
-        "title": title,
-        "sections": sections.map((e) => e.toJson()).toList(),
-        "emptyViewTitleVariants": emptyViewTitleVariants,
-        "emptyViewSubtitleVariants": emptyViewSubtitleVariants,
-        "showsTabBadge": showsTabBadge,
-        "systemIcon": systemIcon,
-        "backButton": backButton?.toJson(),
-      };
+  CPListTemplateMessage toMessage() => CPListTemplateMessage(
+        elementId: elementId,
+        sections: sections.map((e) => e.toMessage()).toList(),
+        showsTabBadge: showsTabBadge,
+        systemIcon: systemIcon,
+        title: title,
+        emptyViewSubtitleVariants: emptyViewSubtitleVariants,
+        emptyViewTitleVariants: emptyViewTitleVariants,
+        backButton: backButton?.toMessage(),
+      );
+  @override
+  CPTemplateMessage toTemplateMessage() => CPTemplateMessage(
+        list: toMessage(),
+      );
 
-  String get uniqueId {
-    return _elementId;
+  void updateSections(List<CPListSection> sections) {
+    this.sections = sections;
+    CarplayControllerInternal.instance.updateListSections(this);
+  }
+
+  @override
+  List<CPObject> getChildren() {
+    return sections;
   }
 }

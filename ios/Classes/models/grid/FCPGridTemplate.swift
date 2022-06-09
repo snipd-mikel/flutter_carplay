@@ -9,29 +9,29 @@ import CarPlay
 
 @available(iOS 14.0, *)
 class FCPGridTemplate {
-  private(set) var _super: CPGridTemplate?
+  private(set) lazy var cpInstance: CPGridTemplate = {
+    return CPGridTemplate.init(title: title, gridButtons: buttons.map({$0.cpInstance}))
+  } ()
   private(set) var elementId: String
   private var title: String
-  private var buttons: [CPGridButton]
-  private var objcButtons: [FCPGridButton]
+  private var buttons: [FCPGridButton]
   
-  init(obj: [String : Any]) {
-    self.elementId = obj["_elementId"] as! String
-    self.title = obj["title"] as! String
-    self.objcButtons = (obj["buttons"] as! Array<[String : Any]>).map {
-      FCPGridButton(obj: $0)
+  init(message: FCPGridTemplateMessage) {
+    elementId = message.elementId
+    title = message.title
+    buttons = message.buttons.map {
+      FCPGridButton(message: $0)
     }
-    self.buttons = self.objcButtons.map {
-      $0.get
-    }
-  }
-  
-  var get: CPGridTemplate {
-    let gridTemplate = CPGridTemplate.init(title: self.title, gridButtons: self.buttons)
-    self._super = gridTemplate
-    return gridTemplate
   }
 }
 
 @available(iOS 14.0, *)
-extension FCPGridTemplate: FCPRootTemplate { }
+extension FCPGridTemplate: FCPRootTemplate {
+  func getCPTemplate() -> CPTemplate {
+    return cpInstance
+  }
+  
+  var children: [FCPObject] {
+    return buttons
+  }
+}

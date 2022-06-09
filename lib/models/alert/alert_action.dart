@@ -1,36 +1,32 @@
-import 'package:flutter_carplay/helpers/enum_utils.dart';
-import 'package:flutter_carplay/models/alert/alert_constants.dart';
-import 'package:uuid/uuid.dart';
+import 'package:flutter_carplay/messages.dart';
+
+import '../template_base.dart';
 
 /// An object that encapsulates an action the user can take on [CPActionSheetTemplate] or [CPAlertTemplate].
-class CPAlertAction {
-  /// Unique id of the object.
-  final String _elementId = const Uuid().v4();
-
+class CPAlertAction extends CPPresentAction {
   /// The action button's title.
   final String title;
 
   /// The display style for the action button.
-  /// Default is [CPAlertActionStyles.normal]
-  final CPAlertActionStyles style;
+  /// Default is [CPAlertActionStyle.normal]
+  final CPAlertActionStyle style;
 
   /// A callback function that CarPlay invokes after the user taps the action button.
+  @override
   final Function() onPress;
 
   /// Creates [CPAlertAction] with a title, style, and action handler.
   CPAlertAction({
     required this.title,
-    this.style = CPAlertActionStyles.normal,
+    this.style = CPAlertActionStyle.normal,
     required this.onPress,
   });
 
-  Map<String, dynamic> toJson() => {
-        "_elementId": _elementId,
-        "title": title,
-        "style": CPEnumUtils.stringFromEnum(style.toString()),
-      };
+  CPAlertActionMessage toMessage() =>
+      CPAlertActionMessage(elementId: elementId, title: title, style: style);
 
-  String get uniqueId {
-    return _elementId;
+  @override
+  List<CPObject> getChildren() {
+    return [];
   }
 }

@@ -1,11 +1,9 @@
+import 'package:flutter_carplay/messages.dart';
 import 'package:flutter_carplay/models/alert/alert_action.dart';
-import 'package:uuid/uuid.dart';
+import 'package:flutter_carplay/models/template_base.dart';
 
 /// A template object that displays a modal alert.
-class CPAlertTemplate {
-  /// Unique id of the object.
-  final String _elementId = const Uuid().v4();
-
+class CPAlertTemplate extends CPPresentTemplate {
   /// The array of title variants.
   /// When the system displays the alert, it selects the title that best fits
   /// the available screen space, so arrange the titles from most to least preferred
@@ -14,6 +12,7 @@ class CPAlertTemplate {
   final List<String> titleVariants;
 
   /// The array of actions as [CPAlertAction] will be available on the alert.
+  @override
   final List<CPAlertAction> actions;
 
   /// Fired when the alert presented to CarPlay. With this callback function, it can be
@@ -30,14 +29,14 @@ class CPAlertTemplate {
     this.onPresent,
   });
 
-  Map<String, dynamic> toJson() => {
-        "_elementId": _elementId,
-        "titleVariants": titleVariants,
-        "actions": actions.map((e) => e.toJson()).toList(),
-        "onPresent": onPresent != null ? true : false,
-      };
+  CPAlertTemplateMessage toMessage() => CPAlertTemplateMessage(
+      elementId: elementId,
+      titleVariants: titleVariants,
+      actions: actions.map((e) => e.toMessage()).toList(),
+      onPresent: onPresent == null ? true : false);
 
-  String get uniqueId {
-    return _elementId;
+  @override
+  List<CPObject> getChildren() {
+    return actions;
   }
 }

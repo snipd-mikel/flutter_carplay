@@ -7,17 +7,18 @@ issue_tracker: https://github.com/oguzhnatly/flutter_carplay/issues
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
-  flutter: ">=1.20.0"
+  flutter: '>=2.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
-  uuid: ^3.0.4
+  uuid: ^3.0.6
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^1.0.0
+  flutter_lints: ^2.0.0
+  pigeon: ^3.1.5
 
 flutter:
   plugin:

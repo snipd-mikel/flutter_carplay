@@ -1,12 +1,10 @@
+import 'package:flutter_carplay/messages.dart';
 import 'package:flutter_carplay/models/list/list_template.dart';
-import 'package:uuid/uuid.dart';
+import 'package:flutter_carplay/models/template_base.dart';
 
 /// A template object that contains a collection of [CPListTemplate] templates,
 /// each of which occupies one tab in the tab bar.
-class CPTabBarTemplate {
-  /// Unique id of the object.
-  final String _elementId = const Uuid().v4();
-
+class CPTabBarTemplate extends CPTemplate {
   /// A title that describes the content of the tab.
   ///
   /// CarPlay only displays the title when the template is a root-template of a tab
@@ -29,13 +27,17 @@ class CPTabBarTemplate {
     required this.templates,
   });
 
-  Map<String, dynamic> toJson() => {
-        "_elementId": _elementId,
-        "title": title,
-        "templates": templates.map((e) => e.toJson()).toList(),
-      };
+  CPTabBarTemplateMessage toMessage() => CPTabBarTemplateMessage(
+      elementId: elementId,
+      templates: templates.map((e) => e.toMessage()).toList());
 
-  String get uniqueId {
-    return _elementId;
+  @override
+  List<CPObject> getChildren() {
+    return templates;
   }
+
+  @override
+  CPTemplateMessage toTemplateMessage() => CPTemplateMessage(
+        tabBar: toMessage(),
+      );
 }

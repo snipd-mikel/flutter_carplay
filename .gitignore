@@ -7,7 +7,6 @@
 build/
 
 # IntelliJ IDEA
-*.iml
 *.iws
 /out/
 
@@ -39,3 +38,9 @@ build/
 .idea/navEditor.xml
 .idea/codeStyles/
 .idea/runConfigurations.xml
+
+.gradle/**
+gradle/**
+gradlew
+gradlew.bat
+local.properties

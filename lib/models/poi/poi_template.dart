@@ -1,28 +1,30 @@
-import 'package:uuid/uuid.dart';
+import 'package:flutter_carplay/messages.dart';
+import 'package:flutter_carplay/models/template_base.dart';
+
 import 'poi.dart';
 
 /// A template object that displays point of interest.
-class CPPointOfInterestTemplate {
-  /// Unique id of the object.
-  final String _elementId = const Uuid().v4();
-
+class CPPointOfInterestTemplate extends CPTemplate {
   /// A title will be shown in the navigation bar.
   final String title;
   final List<CPPointOfInterest> poi;
 
   /// Creates [CPPointOfInterestTemplate]
-  CPPointOfInterestTemplate({
-    required this.title,
-    required this.poi
-  });
+  CPPointOfInterestTemplate({required this.title, required this.poi});
 
-  Map<String, dynamic> toJson() => {
-    "_elementId": _elementId,
-    "title": title,
-    "poi": poi.map((e) => e.toJson()).toList(),
-  };
+  CPPointOfInterestTemplateMessage toMessage() =>
+      CPPointOfInterestTemplateMessage(
+        elementId: elementId,
+        title: title,
+        poi: poi.map((e) => e.toMessage()).toList(),
+      );
+  @override
+  CPTemplateMessage toTemplateMessage() => CPTemplateMessage(
+        poi: toMessage(),
+      );
 
-  String get uniqueId {
-    return _elementId;
+  @override
+  List<CPObject> getChildren() {
+    return poi;
   }
 }

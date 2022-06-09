@@ -1,16 +1,11 @@
+import 'package:flutter_carplay/messages.dart';
 import 'package:flutter_carplay/models/button/text_button.dart';
-import 'package:flutter_carplay/helpers/enum_utils.dart';
-import 'information_constants.dart';
+import 'package:flutter_carplay/models/template_base.dart';
+
 import 'information_item.dart';
 
-
-import 'package:uuid/uuid.dart';
-
 /// A template object that displays and manages information items and text buttons.
-class CPInformationTemplate {
-  /// Unique id of the object.
-  final String _elementId = const Uuid().v4();
-
+class CPInformationTemplate extends CPTemplate {
   /// A title will be shown in the navigation bar.
   final String title;
 
@@ -23,7 +18,6 @@ class CPInformationTemplate {
 
   final List<CPInformationItem> informationItems;
 
-
   /// Creates [CPInformationTemplate]
   CPInformationTemplate({
     required this.title,
@@ -32,15 +26,21 @@ class CPInformationTemplate {
     required this.informationItems,
   });
 
-  Map<String, dynamic> toJson() => {
-    "_elementId": _elementId,
-    "layout": CPEnumUtils.stringFromEnum(layout.toString()),
-    "title": title,
-    "actions": actions.map((e) => e.toJson()).toList(),
-    "informationItems": informationItems.map((e) => e.toJson()).toList(),
-  };
+  CPInformationTemplateMessage toMessage() => CPInformationTemplateMessage(
+        elementId: elementId,
+        title: title,
+        layout: layout,
+        actions: actions.map((e) => e.toMessage()).toList(),
+        informationItems: informationItems.map((e) => e.toMessage()).toList(),
+      );
 
-  String get uniqueId {
-    return _elementId;
+  @override
+  CPTemplateMessage toTemplateMessage() => CPTemplateMessage(
+        information: toMessage(),
+      );
+
+  @override
+  List<CPObject> getChildren() {
+    return [...informationItems, ...actions];
   }
 }

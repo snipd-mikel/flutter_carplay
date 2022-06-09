@@ -8,46 +8,48 @@
 import CarPlay
 
 @available(iOS 14.0, *)
-class FCPListItem {
-  private(set) var _super: CPListItem?
-  private(set) var elementId: String
-  private var text: String
-  private var detailText: String?
-  private var isOnPressListenerActive: Bool = false
-  private var completeHandler: (() -> Void)?
-  private var image: String?
-  private var playbackProgress: CGFloat?
-  private var isPlaying: Bool?
-  private var playingIndicatorLocation: CPListItemPlayingIndicatorLocation?
-  private var accessoryType: CPListItemAccessoryType?
-  
-  init(obj: [String : Any]) {
-    self.elementId = obj["_elementId"] as! String
-    self.text = obj["text"] as! String
-    self.detailText = obj["detailText"] as? String
-    self.isOnPressListenerActive = obj["onPress"] as? Bool ?? false
-    self.image = obj["image"] as? String
-    self.playbackProgress = obj["playbackProgress"] as? CGFloat
-    self.isPlaying = obj["isPlaying"] as? Bool
-    self.setPlayingIndicatorLocation(fromString: obj["playingIndicatorLocation"] as? String)
-    self.setAccessoryType(fromString: obj["accessoryType"] as? String)
+func toCPListItemAccessoryType(_ type: FCPListItemAccessoryType) -> CPListItemAccessoryType {
+  switch(type) {
+  case .none:
+    return CPListItemAccessoryType.none
+  case .cloud:
+    return .cloud
+  case .disclosureIndicator:
+    return .disclosureIndicator
+  @unknown default:
+    return CPListItemAccessoryType.none
   }
-  
-  var get: CPListItem {
+}
+
+@available(iOS 14.0, *)
+func toCPListItemPlayingIndicatorLocation(_ type: FCPListItemPlayingIndicatorLocation) -> CPListItemPlayingIndicatorLocation {
+  switch(type) {
+  case .trailing:
+    return .trailing
+  case .leading:
+    return .leading
+  @unknown default:
+    return.leading
+  }
+}
+
+
+@available(iOS 14.0, *)
+class FCPListItem {
+  private(set) lazy var cpInstance: CPListItem = {
     let listItem = CPListItem.init(text: text, detailText: detailText)
-    listItem.handler = ((CPSelectableListItem, @escaping () -> Void) -> Void)? { selectedItem, complete in
-      if self.isOnPressListenerActive == true {
+    listItem.handler = ((CPSelectableListItem, @escaping () -> Void) -> Void)? { [self] selectedItem, complete in
+      if isOnPressListenerActive == true {
         DispatchQueue.main.async {
           self.completeHandler = complete
-          FCPStreamHandlerPlugin.sendEvent(type: FCPChannelTypes.onListItemSelected,
-                                           data: ["elementId": self.elementId])
+          SwiftFlutterCarplayPlugin.shared.onListItemSelected(self.elementId)
         }
       } else {
         complete()
       }
     }
     if image != nil {
-      listItem.setImage(UIImage().fromFlutterAsset(name: image!))
+      listItem.setImage(image?.toUIImage(size: CPListItem.maximumImageSize))
     }
     if playbackProgress != nil {
       listItem.playbackProgress = playbackProgress!
@@ -56,73 +58,96 @@ class FCPListItem {
       listItem.isPlaying = isPlaying!
     }
     if playingIndicatorLocation != nil {
-      listItem.playingIndicatorLocation = playingIndicatorLocation!
+      listItem.playingIndicatorLocation = toCPListItemPlayingIndicatorLocation(playingIndicatorLocation!)
     }
     if accessoryType != nil {
-      listItem.accessoryType = accessoryType!
+      listItem.accessoryType = toCPListItemAccessoryType(accessoryType!)
     }
-    self._super = listItem
     return listItem
+  }()
+  private(set) var elementId: String
+  private(set) var text: String
+  private(set) var detailText: String?
+  private var isOnPressListenerActive: Bool = false
+  private var completeHandler: (() -> Void)?
+  private(set) var image: FCPImage?
+  private(set) var playbackProgress: CGFloat?
+  private(set) var isPlaying: Bool?
+  private(set) var playingIndicatorLocation: FCPListItemPlayingIndicatorLocation? 
+  private(set) var accessoryType: FCPListItemAccessoryType?
+  
+  init(message: FCPListItemMessage) {
+    elementId = message.elementId
+    text = message.text
+    detailText = message.detailText
+    isOnPressListenerActive = message.onPress.boolValue
+    image = message.image?.toFCPImage()
+    isPlaying = message.isPlaying?.boolValue
+    accessoryType = message.accessoryType
+    playingIndicatorLocation = message.playingIndicatorLocation
+    let playbackFloat = message.playbackProgress?.floatValue
+    
+    if playbackFloat != nil {
+      playbackProgress = CGFloat(playbackFloat!)
+    }
+    
   }
   
   public func stopHandler() {
-    guard self.completeHandler != nil else {
+    guard completeHandler != nil else {
       return
     }
-    self.completeHandler!()
-    self.completeHandler = nil
+    completeHandler!()
+    completeHandler = nil
   }
   
-  public func update(text: String?, detailText: String?, image: String?, playbackProgress: CGFloat?, isPlaying: Bool?, playingIndicatorLocation: String?, accessoryType: String?) {
-    if text != nil {
-      self._super?.setText(text!)
-      self.text = text!
-    }
-    if detailText != nil {
-      self._super?.setDetailText(detailText)
-      self.detailText = detailText
-    }
-    if image != nil {
-      self._super?.setImage(UIImage().fromFlutterAsset(name: image!))
-      self.image = image
-    }
-    if playbackProgress != nil {
-      self._super?.playbackProgress = playbackProgress!
-      self.playbackProgress = playbackProgress
-    }
-    if isPlaying != nil {
-      self._super?.isPlaying = isPlaying!
-      self.isPlaying = isPlaying
-    }
-    if playingIndicatorLocation != nil {
-      self.setPlayingIndicatorLocation(fromString: playingIndicatorLocation)
-      if self.playingIndicatorLocation != nil {
-        self._super?.playingIndicatorLocation = self.playingIndicatorLocation!
+  public func update(
+    text: String?,
+    detailText: String?,
+    image: FCPImage?,
+    playbackProgress: CGFloat?,
+    isPlaying: Bool?,
+    playingIndicatorLocation: FCPListItemPlayingIndicatorLocation?,
+    accessoryType: FCPListItemAccessoryType?) {
+      if text != nil {
+        cpInstance.setText(text!)
+        self.text = text!
+      }
+      if detailText != nil {
+        cpInstance.setDetailText(detailText)
+        self.detailText = detailText
+      }
+      if image != nil {
+        cpInstance.setImage(image?.toUIImage(size: CPListItem.maximumImageSize))
+        self.image = image
+      }
+      if playbackProgress != nil {
+        cpInstance.playbackProgress = playbackProgress!
+        self.playbackProgress = playbackProgress
+      }
+      if isPlaying != nil {
+        cpInstance.isPlaying = isPlaying!
+        self.isPlaying = isPlaying
+      }
+      if playingIndicatorLocation != nil {
+        self.playingIndicatorLocation = playingIndicatorLocation!
+        if playingIndicatorLocation != nil {
+          cpInstance.playingIndicatorLocation = toCPListItemPlayingIndicatorLocation(self.playingIndicatorLocation!)
+        }
+      }
+      if accessoryType != nil {
+        self.accessoryType = accessoryType!
+        if accessoryType != nil {
+          cpInstance.accessoryType = toCPListItemAccessoryType(self.accessoryType!)
+        }
       }
     }
-    if accessoryType != nil {
-      self.setAccessoryType(fromString: accessoryType)
-      if self.accessoryType != nil {
-        self._super?.accessoryType = self.accessoryType!
-      }
-    }
-  }
   
-  private func setPlayingIndicatorLocation(fromString: String?) {
-    if fromString == "leading" {
-      self.playingIndicatorLocation = CPListItemPlayingIndicatorLocation.leading
-    } else if fromString == "trailing" {
-      self.playingIndicatorLocation = CPListItemPlayingIndicatorLocation.trailing
-    }
-  }
-  
-  private func setAccessoryType(fromString: String?) {
-    if fromString == "cloud" {
-      self.accessoryType = CPListItemAccessoryType.cloud
-    } else if fromString == "disclosureIndicator" {
-      self.accessoryType = CPListItemAccessoryType.disclosureIndicator
-    } else {
-      self.accessoryType = CPListItemAccessoryType.none
-    }
+}
+
+@available(iOS 14.0, *)
+extension FCPListItem: FCPObject {
+  var children: [FCPObject] {
+    return []
   }
 }

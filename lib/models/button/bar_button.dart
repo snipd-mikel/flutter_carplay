@@ -1,18 +1,14 @@
-import 'package:flutter_carplay/helpers/enum_utils.dart';
-import 'package:flutter_carplay/models/button/alert_constants.dart';
-import 'package:uuid/uuid.dart';
+import 'package:flutter_carplay/messages.dart';
+import 'package:flutter_carplay/models/template_base.dart';
 
 /// A button object for placement in a navigation bar.
-class CPBarButton {
-  /// Unique id of the object.
-  final String _elementId = const Uuid().v4();
-
+class CPBarButton extends CPObject {
   /// The title displayed on the bar button.
   final String title;
 
   /// The style to use when displaying the button.
-  /// Default is [CPBarButtonStyles.rounded]
-  final CPBarButtonStyles style;
+  /// Default is [CPBarButtonStyle.rounded]
+  final CPBarButtonStyle style;
 
   /// Fired when the user taps a bar button.
   final Function() onPress;
@@ -20,17 +16,18 @@ class CPBarButton {
   /// Creates [CPBarButton] with a title, style and handler.
   CPBarButton({
     required this.title,
-    this.style = CPBarButtonStyles.rounded,
+    this.style = CPBarButtonStyle.rounded,
     required this.onPress,
   });
 
-  Map<String, dynamic> toJson() => {
-        "_elementId": _elementId,
-        "title": title,
-        "style": CPEnumUtils.stringFromEnum(style.toString()),
-      };
+  CPBarButtonMessage toMessage() => CPBarButtonMessage(
+        elementId: elementId,
+        style: style,
+        title: title,
+      );
 
-  String get uniqueId {
-    return _elementId;
+  @override
+  List<CPObject> getChildren() {
+    return [];
   }
 }

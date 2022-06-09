@@ -1,25 +1,18 @@
-import 'package:uuid/uuid.dart';
+import 'package:flutter_carplay/messages.dart';
+import 'package:flutter_carplay/models/template_base.dart';
 
 /// A information item  object displayed on a information template.
-class CPInformationItem {
-  /// Unique id of the object.
-  final String _elementId = const Uuid().v4();
-
+class CPInformationItem extends CPObject {
   final String? title;
   final String? detail;
 
-  CPInformationItem({
-    this.title,
-    this.detail
-  });
+  CPInformationItem({this.title, this.detail});
 
-  Map<String, dynamic> toJson() => {
-    "_elementId": _elementId,
-    "title": title,
-    "detail": detail,
-  };
+  CPInformationItemMessage toMessage() => CPInformationItemMessage(
+      elementId: elementId, title: title, detail: detail);
 
-  String get uniqueId {
-    return _elementId;
+  @override
+  List<CPObject> getChildren() {
+    return [];
   }
 }

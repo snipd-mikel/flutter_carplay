@@ -9,30 +9,29 @@ import CarPlay
 
 @available(iOS 14.0, *)
 class FCPListSection {
-  private(set) var _super: CPListSection?
+  private(set) lazy var cpInstance: CPListSection = {
+    CPListSection.init(items: items.map({$0.cpInstance}), header: header, sectionIndexTitle: header)
+  }()
   private(set) var elementId: String
   private var header: String?
-  private var items: [CPListTemplateItem]
-  private var objcItems: [FCPListItem]
+  private var items: [FCPListItem]
   
-  init(obj: [String : Any]) {
-    self.elementId = obj["_elementId"] as! String
-    self.header = obj["header"] as? String
-    self.objcItems = (obj["items"] as! Array<[String : Any]>).map {
-      FCPListItem(obj: $0)
+  init(message: FCPListSectionMessage) {
+    elementId = message.elementId
+    header = message.header
+    items = message.items.map {
+      FCPListItem(message: $0)
     }
-    self.items = self.objcItems.map {
-      $0.get
-    }
-  }
-  
-  var get: CPListSection {
-    let listSection = CPListSection.init(items: items, header: header, sectionIndexTitle: header)
-    self._super = listSection
-    return listSection
   }
   
   public func getItems() -> [FCPListItem] {
-    return objcItems 
+    return items
+  }
+}
+
+@available(iOS 14.0, *)
+extension FCPListSection: FCPObject {
+  var children: [FCPObject] {
+    return items
   }
 }

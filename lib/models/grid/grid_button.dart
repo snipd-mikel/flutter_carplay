@@ -1,10 +1,9 @@
-import 'package:uuid/uuid.dart';
+import 'package:flutter_carplay/messages.dart';
+import 'package:flutter_carplay/models/image.dart';
+import 'package:flutter_carplay/models/template_base.dart';
 
 /// A grid button object displayed on a grid template.
-class CPGridButton {
-  /// Unique id of the object.
-  final String _elementId = const Uuid().v4();
-
+class CPGridButton extends CPObject {
   /// An array of title variants for the button.
   /// When the system displays the button, it selects the title that best fits the available
   /// screen space, so arrange the titles from most to least preferred when creating a grid button.
@@ -17,7 +16,7 @@ class CPGridButton {
   ///
   /// **[!] When creating a grid button, do NOT provide an animated image. If you do, the button
   /// uses the first image in the animation sequence.**
-  final String image;
+  final CPImage image;
 
   /// Fired after the user taps the button.
   final Function() onPress;
@@ -28,13 +27,13 @@ class CPGridButton {
     required this.onPress,
   });
 
-  Map<String, dynamic> toJson() => {
-        "_elementId": _elementId,
-        "titleVariants": titleVariants,
-        "image": image,
-      };
+  CPGridButtonMessage toMessage() => CPGridButtonMessage(
+      elementId: elementId,
+      titleVariants: titleVariants,
+      image: image.toMessage());
 
-  String get uniqueId {
-    return _elementId;
+  @override
+  List<CPObject> getChildren() {
+    return [];
   }
 }

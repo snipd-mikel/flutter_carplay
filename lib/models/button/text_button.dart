@@ -1,26 +1,14 @@
-import 'package:flutter_carplay/helpers/enum_utils.dart';
-import 'package:uuid/uuid.dart';
-
-
-enum CPTextButtonStyles {
-  normal,
-  cancel,
-  confirm,
-
-}
-
+import 'package:flutter_carplay/messages.dart';
+import 'package:flutter_carplay/models/template_base.dart';
 
 /// A button object for placement in a point of interest or information template.
-class CPTextButton {
-  /// Unique id of the object.
-  final String _elementId = const Uuid().v4();
-
+class CPTextButton extends CPObject {
   /// The title displayed on the bar button.
   final String title;
 
   /// The style to use when displaying the button.
-  /// Default is [CPTextButtonStyles.normal]
-  final CPTextButtonStyles style;
+  /// Default is [CPTextButtonStyle.normal]
+  final CPTextButtonStyle style;
 
   /// Fired when the user taps a text button.
   final Function() onPress;
@@ -28,17 +16,15 @@ class CPTextButton {
   /// Creates [CPTextButton] with a title, style and handler.
   CPTextButton({
     required this.title,
-    this.style = CPTextButtonStyles.normal,
+    this.style = CPTextButtonStyle.normal,
     required this.onPress,
   });
 
-  Map<String, dynamic> toJson() => {
-    "_elementId": _elementId,
-    "title": title,
-    "style": CPEnumUtils.stringFromEnum(style.toString()),
-  };
+  CPTextButtonMessage toMessage() =>
+      CPTextButtonMessage(elementId: elementId, title: title, style: style);
 
-  String get uniqueId {
-    return _elementId;
+  @override
+  List<CPObject> getChildren() {
+    return [];
   }
 }

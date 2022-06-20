@@ -785,18 +785,18 @@ static id GetNullableObjectAtIndex(NSArray* array, NSInteger key) {
 @implementation FCPImageMessage
 + (instancetype)makeWithSystemName:(nullable NSString *)systemName
     flutterAsset:(nullable NSString *)flutterAsset
-    base64:(nullable NSString *)base64 {
+    data:(nullable FlutterStandardTypedData *)data {
   FCPImageMessage* pigeonResult = [[FCPImageMessage alloc] init];
   pigeonResult.systemName = systemName;
   pigeonResult.flutterAsset = flutterAsset;
-  pigeonResult.base64 = base64;
+  pigeonResult.data = data;
   return pigeonResult;
 }
 + (FCPImageMessage *)fromMap:(NSDictionary *)dict {
   FCPImageMessage *pigeonResult = [[FCPImageMessage alloc] init];
   pigeonResult.systemName = GetNullableObject(dict, @"systemName");
   pigeonResult.flutterAsset = GetNullableObject(dict, @"flutterAsset");
-  pigeonResult.base64 = GetNullableObject(dict, @"base64");
+  pigeonResult.data = GetNullableObject(dict, @"data");
   return pigeonResult;
 }
 + (nullable FCPImageMessage *)nullableFromMap:(NSDictionary *)dict { return (dict) ? [FCPImageMessage fromMap:dict] : nil; }
@@ -804,7 +804,7 @@ static id GetNullableObjectAtIndex(NSArray* array, NSInteger key) {
   return @{
     @"systemName" : (self.systemName ?: [NSNull null]),
     @"flutterAsset" : (self.flutterAsset ?: [NSNull null]),
-    @"base64" : (self.base64 ?: [NSNull null]),
+    @"data" : (self.data ?: [NSNull null]),
   };
 }
 @end

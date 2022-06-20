@@ -4,7 +4,16 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f5fb0b89-71c7-4b2b-a91d-dc73570843de" name="Default Changelist" comment="" />
+    <list default="true" id="f5fb0b89-71c7-4b2b-a91d-dc73570843de" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Classes/FCPImage.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Classes/FCPImage.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Classes/SwiftFlutterCarplayPlugin.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Classes/SwiftFlutterCarplayPlugin.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Classes/messages.h" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Classes/messages.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Classes/messages.m" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Classes/messages.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/messages.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/messages.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/models/image.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/models/image.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pigeons/messages.dart" beforeDir="false" afterPath="$PROJECT_DIR$/pigeons/messages.dart" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -45,6 +54,7 @@
     <setting file="file://$PROJECT_DIR$/lib/models/now_playing/now_playing_template.dart" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/ios/Classes/flutter_carplay.h" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/lib/models/now_playing/now_playing_button.dart" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/lib/models/image.dart" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/lib/models/template_base.dart" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/lib/carplay_controller.dart" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/lib/models/information/information_item.dart" root0="SKIP_INSPECTION" />

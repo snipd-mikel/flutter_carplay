@@ -728,18 +728,18 @@ class CPImageMessage {
   CPImageMessage({
     this.systemName,
     this.flutterAsset,
-    this.base64,
+    this.data,
   });
 
   String? systemName;
   String? flutterAsset;
-  String? base64;
+  Uint8List? data;
 
   Object encode() {
     final Map<Object?, Object?> pigeonMap = <Object?, Object?>{};
     pigeonMap['systemName'] = systemName;
     pigeonMap['flutterAsset'] = flutterAsset;
-    pigeonMap['base64'] = base64;
+    pigeonMap['data'] = data;
     return pigeonMap;
   }
 
@@ -748,7 +748,7 @@ class CPImageMessage {
     return CPImageMessage(
       systemName: pigeonMap['systemName'] as String?,
       flutterAsset: pigeonMap['flutterAsset'] as String?,
-      base64: pigeonMap['base64'] as String?,
+      data: pigeonMap['data'] as Uint8List?,
     );
   }
 }

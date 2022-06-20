@@ -10,7 +10,7 @@
 enum FCPImage {
   case systemName(String)
   case flutterAsset(String)
-  case base64(String)
+  case data(Data)
   case unknown
   
   static func fromMessage(_ message: FCPImageMessage) -> FCPImage {
@@ -20,8 +20,8 @@ enum FCPImage {
     if message.systemName != nil {
       return FCPImage.systemName(message.systemName!)
     }
-    if message.base64 != nil {
-      return FCPImage.base64(message.base64!)
+    if message.data != nil {
+      return FCPImage.data(message.data!.data)
     }
     
     return FCPImage.unknown
@@ -38,10 +38,7 @@ enum FCPImage {
         return image
       }
       return image.scalePreservingAspectRatio(targetSize: size)
-    case .base64(let base64):
-      guard let data = Data(base64Encoded: base64) else {
-        return UIImage(systemName: "questionmark")!
-      }
+    case .data(let data):
       guard let image = UIImage(data: data) else {
         return UIImage(systemName: "questionmark")!
       }

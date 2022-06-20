@@ -323,10 +323,10 @@ typedef NS_ENUM(NSUInteger, FCPAlertActionStyle) {
 @interface FCPImageMessage : NSObject
 + (instancetype)makeWithSystemName:(nullable NSString *)systemName
     flutterAsset:(nullable NSString *)flutterAsset
-    base64:(nullable NSString *)base64;
+    data:(nullable FlutterStandardTypedData *)data;
 @property(nonatomic, copy, nullable) NSString * systemName;
 @property(nonatomic, copy, nullable) NSString * flutterAsset;
-@property(nonatomic, copy, nullable) NSString * base64;
+@property(nonatomic, strong, nullable) FlutterStandardTypedData * data;
 @end
 
 /// The codec used by FCarplayApi.

@@ -168,6 +168,7 @@ public class SwiftFlutterCarplayPlugin : NSObject, FCarplayApi, CPNowPlayingTemp
     
     do {
       let result = try await interfaceController.pushTemplate(fcpTemplate.getCPTemplate(), animated: animate.boolValue)
+      
       if result {
         state.push(fcpTemplate)
       }

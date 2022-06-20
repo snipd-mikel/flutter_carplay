@@ -180,7 +180,7 @@ class CPTemplateMessage {
 class CPImageMessage {
   String? systemName;
   String? flutterAsset;
-  String? base64;
+  Uint8List? data;
 }
 
 @ConfigurePigeon(PigeonOptions(

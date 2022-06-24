@@ -10,6 +10,11 @@
 
 @implementation FlutterCarplayPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-  [SwiftFlutterCarplayPlugin registerWithRegistrar:registrar];
+  if (@available(iOS 14, *)) {
+    [SwiftFlutterCarplayPlugin registerWithRegistrar:registrar];
+  } else {
+    // Do nothing
+  }
+  
 }
 @end

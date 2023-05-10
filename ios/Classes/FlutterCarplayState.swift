@@ -23,9 +23,9 @@ class FlutterCarplayNowPlayingState {
 @available(iOS 14.0, *)
 class FlutterCarplayState {
   private(set) var historyStack: [FCPRootTemplate] = []
-  private var objectMap: [String : FCPObject] = [:]
-  private var parentMap: [String: String] = [:]
-  private var templateMap: [CPTemplate : String] = [:]
+  private var objectMap: ThreadSafeDictionary<String, FCPObject> = ThreadSafeDictionary(dict: [:])
+  private var parentMap: ThreadSafeDictionary<String, String> = ThreadSafeDictionary(dict: [:])
+  private var templateMap: ThreadSafeDictionary<CPTemplate, String> = ThreadSafeDictionary(dict: [:])
   private(set) var rootTemplate: FCPRootTemplate?
   private(set) var presentTemplate: FCPPresentTemplate?
   let nowPlaying = FlutterCarplayNowPlayingState()
